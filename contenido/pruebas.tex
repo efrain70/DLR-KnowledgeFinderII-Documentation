@@ -1,0 +1,87 @@
+% ------------------------------------------------------------------------------
+% Este fichero es parte de la plantilla LaTeX para la realización de Proyectos
+% Final de Grado, protegido bajo los términos de la licencia GFDL.
+% Para más información, la licencia completa viene incluida en el
+% fichero fdl-1.3.tex
+
+% Copyright (C) 2012 SPI-FM. Universidad de Cádiz
+% ------------------------------------------------------------------------------
+
+% En este capítulo se presenta el plan de pruebas del sistema de información, incluyendo los diferentes tipos de pruebas que se han llevado a cabo, ya sean manuales (mediante listas de comprobación) o automatizadas mediante algún software específico de pruebas.
+
+En este capítulo se explican el plan de pruebas del proyecto \gls{kf2}.
+
+\section{\IfLanguageName{english}{Test Strategy}{Estrategia}}
+% 1. En esta sección se debe incluir el alcance de las pruebas, hasta donde se pretende llegar con ellas, si se registrarán todas o sólo aquellas de un cierto tipo y cómo se interpretarán y evaluarán los resultados.
+
+% 2. También, se incluirá el procedimiento a seguir para las pruebas de regresión, esto es, la repetición de ciertas pruebas para comprobar que nuevos cambios que se vayan introduciendo no originen errores en el software ya probado.
+
+Por las características del producto, las pruebas de cada componente se han planteado de forma distinta:
+
+\begin{itemize}
+    \item{\textbf{Índice de búsqueda \gls{solr}}}
+    Se han realizado pruebas a bajo nivel para comprobar el correcto funcionamiento de la lectura, transformación e importación de los datos en el servidor \gls{solr}.
+    \item{\textbf{\Gls{sw}}}
+    Este componente ha sido probado durante el proceso de desarrollo de la visualización. Por este motivo, junto con el carácter piloto del \gls{software} y la complejidad de los elementos implicados, no se ha desarrollado explícitamente ningún tipo de pruebas sobre el código.
+    \item{\textbf{Visualización}}
+    Este componente reúne la mayoría de los requisitos funcionales del usuario final. Por ello, se han realizado en él con una alta perseverancia durante todo el proceso de desarrollo las pruebas de sistemas.
+\end{itemize}
+
+\section{\IfLanguageName{english}{Testing Environment}{Entorno de Pruebas}}
+% Incluir en este apartado los requisitos de los entornos hardware/software donde se ejecutarán las pruebas.
+
+El conjunto de pruebas se ha realizado a tres niveles:
+\begin{itemize}
+    \item \textbf{Equipo de desarrollo} Las pruebas se han ejecutado en el equipo del programador durante el desarrollo.
+    \item \textbf{Servidor de pruebas} Para ver el producto en funcionamiento en un equipo semejo a donde se pondrá en producción se ha dispuesto de un servidor de pruebas remoto.
+    \item \textbf{\gls{jenkins}} Esta herramienta ha realizado y registrado el resultado de la fase de \gls{testing} durante el \gls{despliegue} de las distintas versiones intermedias del producto.
+\end{itemize}
+
+\section{\IfLanguageName{english}{Roles}{Roles}}
+En desarrollador se encarga de realizar las pruebas durante todo el desarrollo del producto. 
+% Describir en esa sección cuáles serán los perfiles y participantes necesarios para la ejecución de cada uno de los niveles de prueba.
+
+Todas las pruebas unitarias y de integración han sido ejecutadas únicamente por el desarrollador y las herramientas automáticas.\\
+
+El desarrollador tambíen ha comprobado cumplimiento de los requisitos realizando las pruebas de sistema durante el transcurso la creación del producto.\\
+
+Conjuntamente con el personal de \gls{scvss} y de los institutos \gls{vf} y \gls{fw} asignados al proyecto, el desarrollador se ha encargado de las pruebas de aceptación.
+% usando el servidor de pruebas anteriormente nombrado.
+
+\section{\IfLanguageName{english}{Testing Levels}{Niveles de Pruebas}}
+%En este sección se documentan los diferentes tipos de pruebas que se han llevado a cabo, ya sean manuales o automatizadas mediante algún software específico de pruebas.
+
+\subsection{\IfLanguageName{english}{Unit Testing}{Pruebas Unitarias}}
+El proceso de lectura de la información contenida en \gls{svn} y las transformaciones previas a la importación ha sido probado a través de pruebas unitarias para cada componente funcional.
+% solr
+% Las pruebas unitarias tienen por objetivo localizar errores en cada nuevo artefacto software desarrollado, antes que se produzca la integración con el resto de artefactos del sistema.
+
+\subsection{\IfLanguageName{english}{Integration Testing}{Pruebas de
+Integración}} 
+% solr solrimport + solr in server
+% Este tipo de pruebas tienen por objetivo localizar errores en módulos o subsistemas completos, analizando la interacción entre varios artefactos software.
+Gracias al paquete para pruebas implementado en \gls{solr}, los elementos encargados de la importación han sido probados en un servidor \gls{solr} destinado a tal fin. De esta forma se aseguró que el código encargado de la importación funciona correctamente sobre la versión de \gls{solr} deseada.
+
+\subsection{\IfLanguageName{english}{System Testing}{Pruebas de Sistema}}
+% visualización y webservice
+% En esta actividad se realizan las pruebas de sistema de modo que se asegure que el sistema cumple con todos los requisitos establecidos: funcionales, de almacenamiento, reglas de negocio y no funcionales. Se suelen desarrollar en un entorno específico para pruebas.
+En lo que refiere al índice de búsqueda, se ha comprobado que el índice resultado de la importación contiene la información esperada. Para ello se ha comparado la información contenida en el repositorio \gls{svn} en formato \gls{json} con los datos del índice.\\
+
+Por otra parte, para comprobar el correcto funcionamiento de la aplicación y que el sistema cumple con todos los requisitos establecidos se han realizado pruebas manuales a lo largo de la fase de implementación de la visualización y del \gls{sw}.\\
+
+Con una lista que representa cada caso de uso establecido, se ha comprobado en cada versión de los componentes de visualización y \gls{sw} que los requisitos funcionales concluidos y los requisitos no funcionales han seguido estando satisfechos.
+
+%\subsubsection{\IfLanguageName{english}{Functional Testing}{Pruebas Funcionales}} 
+% Con estas pruebas se analiza el buen funcionamiento de la implementación de los flujos normales y alternativos de los distintos casos de uso del sistema.
+
+
+% \subsubsection{\IfLanguageName{english}{Not-functional testing}{Pruebas No Funcionales}}
+% Estas pruebas pretenden comprobar el funcionamiento del sistema, con respecto a los requisitos no funcionales identificados: eficiencia, seguridad, etc.
+
+
+\subsection{\IfLanguageName{english}{Acceptance Testing}{Pruebas de Aceptación}}
+% El objetivo de estas pruebas es demostrar que el producto está listo para el paso a producción. Suelen ser las mismas pruebas que se realizaron anteriormente pero en el entorno de producción. En estas pruebas, es importante la participación del cliente final.
+Usando el servidor de pruebas anteriormente nombrado, se han realizado las pruebas de aceptación durante la fase cercana a la finalización del esta versión del \gls{framework} \gls{kf2}. Principalmente han consistido en la comprobación de las pruebas de sistema en el servidor.
+
+
+

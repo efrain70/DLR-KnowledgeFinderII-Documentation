@@ -1,0 +1,630 @@
+% ------------------------------------------------------------------------------
+% Este fichero es parte de la plantilla LaTeX para la realización de Proyectos
+% Final de Grado, protegido bajo los términos de la licencia GFDL.
+% Para más información, la licencia completa viene incluida en el
+% fichero fdl-1.3.tex
+
+% Copyright (C) 2012 SPI-FM. Universidad de Cádiz
+% ------------------------------------------------------------------------------
+
+Las instrucciones de uso del \gls{framework} \gls{kf2} aplicado al \gls{strada} se detallan a continuación.
+
+\section{\IfLanguageName{english}{Introduction}{Introducción}}
+% Resumen de los principales objetivos, ámbito y alcance del software desarrollado.
+
+En el presente capitulo se desarrollará el manual de instalación y explotación del índice de búsqueda en \gls{solr}, del servicio web \glslink{despliegue}{desplegado} en \gls{liferay} y de la \gls{ui} en un \gls{portlet} del proyecto \gls{strada} implementado con el \gls{framework} \gls{kf2}.\\
+
+\input{./contenido/manual_intro}
+
+Este manual se divide en tres módulos que se tratarán de expondrán de forma independiente:
+\begin{itemize}
+	\item Índice \gls{solr}
+	\item \Gls{sw} en \gls{liferay}
+	\item \Gls{portlet} de visualización
+\end{itemize}
+
+\section{Requisitos generales previos}
+A continuación se exponen los requisitos necesarios comunes a todos los módulos que se describirán en este manual.
+
+\subsection{Java}
+Basándonos en la documentación de \gls{solr} 4.8.1 \cite{solrinstall}, el servidor requiere la versión de \gls{jsdk} 7 o superior. Aunque impuesto por \gls{solr}, se recomienda usar la misma versión de \gls{jsdk} para los restantes módulos.\\
+
+Una vez se tenga instalado, hay que configurar la variable del sistema $JAVA\_HOME$ para usar el \gls{jsdk} que acabamos de instalar.
+
+\subsection{Eclipse}
+\label{subsubsection:eclipsesolr}
+Para el desarrollo de este software se recomienda utilizar el \gls{ide} \gls{eclipse}. Éste se puede descargar en la dirección oficial \url{http://www.eclipse.org/downloads/}.
+
+\subsection{\maven{} 3}
+La instalación de \gls{maven} se puede realizar en algunos sistemas operativos, como Ubuntu, desde los repositorios oficiales. Desde la dirección oficial (\url{http://maven.apache.org/download.html}) también se pueden descargar e instalar fácilmente.\\
+
+Si no se ha configurado automáticamente durante el paso anterior, hay que crear una variable de sistema $M2\_HOME$ que apunte al directorio donde se ha instalado, por ejemplo:
+\mbox{C:\textbackslash{}Program Files(x86)\textbackslash{}apache-maven-3.1.0}.\\
+
+Si la organización cuenta con un repositorio de \gls{maven} propio, éste se puede añadir editando el fichero \textit{settings.xml} de \gls{maven}. Por ejemplo, para el \gls{scvss}, el repositorio apunta a \url{http://repo.sistec.dlr.de/nexus/content/groups/public/}.\\
+
+Para usarlo conjuntamente con \gls{eclipse} (apartado \ref{subsubsection:eclipsesolr}) se recomienda instalar el \gls{plugin} Maven2Eclipse desde la dirección \url{http://download.eclipse.org/technology/m2e/releases}
+
+\subsection{Cliente \Gls{svn}}
+Para poder obtener el código y trabajar con el repositorio \gls{svn} es necesario instalar un cliente de \gls{svn} 1.7 o superior.\\
+
+También se puede optar por instalar directamente un \gls{plugin} para \gls{eclipse} que incluya este cliente, por ejemplo Subclipse que está disponible bajo la dirección \url{http://subclipse.tigris.org/update_1.10.x}.
+
+\subsection{\Gls{mantis} y \gls{jenkins}}
+\Gls{eclipse} se conecta con \gls{mantis} y \gls{jenkins} a través de Mylyn. Este \gls{plugin} está disponible en la dirección \url{http://download.eclipse.org/mylyn/releases/latest}.\\
+
+Para configurar en Mylyn \gls{mantis} en \gls{eclipse} siga los siguientes pasos:
+\begin{enumerate} 
+	\item Window > Show View > Task List
+	\item Click on Add MyLyn Support
+	\item Install connector (Mantis)
+	\item Boton derecho en task view, add query
+	\item Add new repository
+		\subitem Type: Mantis
+		\subitem Path: https://www.sistec.dlr.de/mantis
+		\subitem User/Pass: Tus credenciales
+		\subitem Validate
+	\item Crear las consultas (queries) deseadas.
+\end{enumerate}
+
+A continuación, la configuración de Mylyn con \gls{jenkins}:
+\begin{enumerate}
+	\item Window > Show View > Builds
+	\item Add build
+		\subitem Type: Hudson [Jenkins]
+		\subitem Path: https://ci.sc.dlr.de/jenkins
+		\subitem User/Pass: Tus credentials
+		\subitem Validate
+	\item Elegir los builds de \gls{kf2} de la lista.
+\end{enumerate}
+
+\section{Índice Solr}
+\label{section:manualsolr}
+En este apartado se describe el manual de desarrollo, instalación y explotación del sistema de importación de datos y su aplicación en un servidor \gls{solr}.
+
+\subsection{\IfLanguageName{english}{Requirements}{Requisitos previos}}
+
+\subsubsection{Apache \gls{solr} 4.8.1}
+\label{subsubsection:solrinstall}
+Desde la dirección \url{http://www.apache.org/dyn/closer.cgi/lucene/solr/4.8.1} nos podemos descargar \gls{solr}. Una vez descargado y descomprimido en un directorio, por ejemplo ``UnzipDirectory'', ejecutamos el servidor \gls{jetty} de ejemplo (código \ref{code:jettysorl}).\\
+
+\begin{listing}[H]
+    \begin{minted}[linenos,
+               numbersep=5pt,
+               frame=single,
+               framesep=2mm]{bash}
+
+java -jar [UnzipDirectory]/solr-4.8.1/example/start.jar
+    \end{minted}
+    \caption{Ejemplo de ejecución inicial de \gls{solr} en \gls{jetty}}
+    \label{code:jettysorl}
+\end{listing}
+
+
+Si todo ha funcionado correctamente, \gls{solr} estaría accesible en la dirección \url{http://localhost:8983/solr}.
+
+
+%\section{\IfLanguageName{english}{}{Inventario de componentes}}
+%Lista de los componentes hardware y software que se incluyen en la versión del
+% producto.
+
+\subsection{\IfLanguageName{english}{Installation and Setup
+procedures}{Procedimientos de instalación}}
+%Procedimientos de instalación y configuración de cada componente hardware y software (base y desarrollado) para asegurar la correcta instalación y explotación del sistema, así como aquellos procedimientos necesarios de migración/carga de datos.
+
+\subsubsection{Obtención del \gls{software}}
+Checkout desde \gls{svn} el índice desde \url{https://svn.sistec.dlr.de/svn/xps/xps-server/branches/visual/solrIndex/} si no se dispone de una copia de trabajo.\\
+
+Checkout desde \gls{svn} del sistema de importación desde \url{https://svn.sistec.dlr.de/svn/xps/xps-server/branches/visual/de.dlr.xps.server.knowledgefinder.handler.dataimport/} si no se dispone de una copia de trabajo.\\
+
+\subsubsection{Construcción del \gls{software}}
+Situándonos en el directorio donde se ha realizado el checkout, ejecutamos las lineas expuestas en el código \ref{code:solrbuild1} y \ref{code:solrbuild2}.
+
+\begin{listing}[H]
+    \begin{minted}[linenos,
+               numbersep=5pt,
+               frame=single,
+               framesep=2mm]{bash}
+
+cd ./de.dlr.xps.server.knowledgefinder.handler.dataimport/
+mvn clean install
+    \end{minted}
+    \caption{Construcción con \gls{maven} de DataImport}
+    \label{code:solrbuild1}
+\end{listing}
+
+\begin{listing}[H]
+    \begin{minted}[linenos,
+               numbersep=5pt,
+               frame=single,
+               framesep=2mm]{bash}
+
+cd ../solrIndex/
+mvn clean install
+    \end{minted}
+    \caption{Construcción con \gls{maven} de índice de búsqueda}
+    \label{code:solrbuild2}
+\end{listing}
+
+
+A través de \gls{eclipse} se puede realizar también siguiendo estos pasos:
+\begin{itemize}
+	\item Añadir un nuevo ``Maven Run Configuration'' usando como directorio base\\
+          $\$\{workspace\_loc:\/de.dlr.xps.server.knowledgefinder.handler.dataimport\}$\\
+          y como ``goal'' clean install para construir el sistema de importación.
+	\item Añadir un nuevo ``Maven Run Configuration'' usando como directorio base\\ 			  $\$\{workspace\_loc:\/solr\_index\}$\\
+		  y como ``goal'' clean install para construir el índice.
+\end{itemize}
+
+\subsubsection{\Gls{despliegue} en el \gls{solr}}
+Para concluir se debe de configurar \gls{solr} para que utilice el índice. Para ello se debe ejecutar el servidor \gls{jetty} como se vio en el apartado \ref{subsubsection:solrinstall} pero indicando la variable $solr.solr.home$ (código \ref{code:solrdeploy}).
+
+\begin{listing}[H]
+    \begin{minted}[linenos,
+               numbersep=5pt,
+               frame=single,
+               framesep=2mm]{bash}
+
+java -jar -Dsolr.solr.home={workspace_loc}/solr_index
+[UnzipDirectory]/solr-4.8.1/example/start.jar
+    \end{minted}
+    \caption{Ejemplo de ejecución de \gls{solr} en \gls{jetty} con el índice de \gls{strada}}
+    \label{code:solrdeploy}
+\end{listing}
+
+\subsubsection{Configuración del índice}
+Después de la instalación, hay que configurar el origen de los datos.\\
+
+Los datos se pueden obtener desde el repositorio \gls{svn} (\url{https://svn-dmz.sistec.dlr.de/svn/xps/fw-test-data/}) y configurar el índice con la ruta de la copia de trabajo local (código \ref{code:importlocal}).
+
+\begin{listing}[H]
+    \begin{minted}[linenos,
+               numbersep=5pt,
+               frame=single,
+               framesep=2mm]{xml}
+
+...
+<entity name="strada"
+processor="SVNEntityProcessor"
+transformer="..."
+query="/KFdata/dat/CS"
+...
+>
+...
+<entity name="fw"
+processor="SVNEntityProcessor"
+transformer="..."
+query="/KFdata/dat/FW"
+...
+>
+...
+    \end{minted}
+    \caption{Configuración del índice desde copia de trabajo local de \gls{svn}}
+    \label{code:importlocal}
+\end{listing}
+
+
+Otra opción es que la importación se realice directamente leyendo el repositorio de \gls{svn} remoto. Para ello hay que configurar también las credenciales para acceder al mismo (código \ref{code:importremote})\\
+
+\begin{listing}[H]
+    \begin{minted}[linenos,
+               numbersep=5pt,
+               frame=single,
+               framesep=2mm]{xml}
+
+...
+<entity name="strada"
+processor="SVNEntityProcessor"
+transformer="..."
+query="https://svn-dmz.sistec.dlr.de/svn/xps/fw-test-data/dat/CS"
+username="usernameSVN"
+password="passwordSVN"
+...
+>
+...
+<entity name="fw"
+processor="SVNEntityProcessor"
+transformer="..."
+query="https://svn-dmz.sistec.dlr.de/svn/xps/fw-test-data/dat/FW"
+username="usernameSVN"
+password="passwordSVN"
+...
+>
+...
+    \end{minted}
+    \caption{Configuración del índice desde repositorio remoto de \gls{svn}}
+    \label{code:importremote}
+\end{listing}
+
+
+\subsubsection*{Configuración en servidor}
+En el código \ref{code:solrdebian} se muestra un ejemplo de configuración para servicio en una máquina de la familia Debian.
+\begin{listing}[H]
+    \begin{minted}[linenos,
+               numbersep=5pt,
+               frame=single,
+               framesep=2mm]{bash}
+
+#!/bin/bash
+#startup script for the Solr server
+#
+# description: Starts and stops the Solr with Jetty daemon.
+# processname: solr (java)
+# pidfile: /var/run/solr.pid
+JAVA_7_HOME=/usr/lib/jvm/jdk1.7.0_60/
+SOLR_HOME=/home/lima_ef/solrIndex/
+JETTY_HOME=/opt/solr-4.8.1/example/
+STOP_PORT=8079
+STOP_KEY=keyStopSolr
+case $1
+in
+start)
+export JAVA.HOME=$JAVA_7_HOME
+java -jar -Dsolr.solr.home=$SOLR_HOME -DSTOP.PORT=$STOP_PORT 
+          -Djetty.home=$JETTY_HOME
+/opt/solr-4.8.1/example/start.jar --start
+;;
+stop)
+export JAVA.HOME=$JAVA_7_HOME
+java -jar -Dsolr.solr.home=$SOLR_HOME -DSTOP.PORT=$STOP_PORT 
+          -Djetty.home=$JETTY_HOME
+/opt/solr-4.8.1/example/start.jar --stop
+;;
+restart)
+export JAVA.HOME=$JAVA_7_HOME
+java -jar -Dsolr.solr.home=$SOLR_HOME -DSTOP.PORT=$STOP_PORT 
+          -Djetty.home=$JETTY_HOME
+/opt/solr-4.8.1/example/start.jar --stop
+java -jar -Dsolr.solr.home=$SOLR_HOME -DSTOP.PORT=$STOP_PORT 
+          -Djetty.home=$JETTY_HOME
+/opt/solr-4.8.1/example/start.jar --start
+;;
+*)
+echo "Usage: /etc/init.d/solr start|stop|restart"
+;;
+esac
+exit 0
+    \end{minted}
+    \caption{Ejemplo de servicio para \gls{solr} en una máquina de Debian (\/etc\/init.de\/solr}
+    \label{code:solrdebian}
+\end{listing}
+
+\subsection{\IfLanguageName{english}{Setup Testing}{Pruebas de implantación}}
+% Descripción de las pruebas a realizar después de la instalación del sistema. 
+Para comprobar que todo el proceso se ha realizado correctamente, la importación debe ser exitosa. Para ello:
+\begin{enumerate}
+	\item Comprobar que en la dirección \url{http://localhost:8983/solr/#/strada} se encuentran las propiedades generales del índice.
+	\item Recargar el índice:
+		\subitem Ir a \textit{Core Admin}.
+		\subitem Seleccionar el índice para \gls{strada}.
+		\subitem Pulsar \textit{Reload}.
+	\item Ir a la dirección \url{http://localhost:8983/solr/#/strada/dataimport//dataimport}
+	\item Pulsar \textit{Execute}
+	\item Para ver si los datos se han importado correctamente, pulsar \textit{Refresh Status} y comprobar el número de documentos importados.
+	\item Mediante una simple consulta, se puede ver cómo han sido importados los datos. Por ejemplo, visitando \url{http://localhost:8983/solr/strada/select?q=*\%3A*&wt=json&indent=true} se obtienen todos los datos importados en formato \gls{json}.
+\end{enumerate}
+
+\subsection{\IfLanguageName{english}{Operating and Service-level
+Procedures}{Procedimientos de operación y nivel de servicio}}
+% Procedimientos necesarios para asegurar el correcto funcionamiento, rendimiento, disponibilidad y seguridad del sistema: back-ups, chequeo de logs, etc. También, es preciso indicar claramente aquellas actuaciones precisas necesarias para el mantenimiento preventivo del sistema y así prevenir posibles fallos en el mismo.
+\Gls{solr} dispone de su propio sistema de \gls{logging}. Durante toda la ejecución de \gls{solr} se puede consultar a través de la interfaz de administración o en la dirección \url{http://localhost:8983/solr/admin/info/logging} (formato \gls{xml}).
+
+\section{\Gls{sw} en \gls{liferay}}
+\label{section:manualsw}
+En esta sección se describe el manual de desarrollo, instalación y explotación del \gls{sw} que se aloja en \gls{liferay} para la utilización del indice \gls{solr} anteriormente 
+explicado.
+
+\subsection{\IfLanguageName{english}{Requirements}{Requisitos previos}}
+
+\subsubsection{Índice \gls{solr}}
+Como es de esperar, este \gls{sw} necesita una instancia del índice \gls{solr} para el proyecto \gls{strada} en funcionamiento. En el punto anterior \ref{section:manualsolr} se explica cómo realizarlo.
+
+\subsubsection{\Gls{liferay} v6.2 CE Server (\gls{tomcat} 7)}
+\label{subsubsection:reqliferay}
+Desde la dirección \url{http://sourceforge.net/projects/lportal/files/Liferay\%20Portal/6.2.1\%20GA2/liferay-portal-tomcat-6.2-ce-ga2-20140319114139101.zip/download} nos podemos descargar \gls{liferay}. Una vez descargado, lo descomprimimos en un directorio, por ejemplo ``UnzipDirectory''.\\
+
+Para ejecutar el servidor \gls{tomcat} con \gls{liferay} de ejemplo (código \ref{code:liferaystart}).\\
+\begin{listing}[H]
+    \begin{minted}[linenos,
+               numbersep=5pt,
+               frame=single,
+               framesep=2mm]{bash}
+               
+java -jar [UnzipDirectory]/liferay-portal-6.2-ce-ga2/tomcat-7.0.42/
+		  bin/catalina.sh start
+    \end{minted}
+    \caption{Ejemplo de ejecución inicial de \gls{liferay} en \gls{tomcat}}
+    \label{code:liferaystart}
+\end{listing}
+
+Si todo ha funcionado correctamente, \gls{liferay} estaá accesible en la dirección \url{http://localhost:8080/} donde se mostrará el formulario para la configuración del portal.\\
+
+Para trabajar más cómodamente en \gls{eclipse} con \gls{maven} y \gls{liferay}, se recomienda instalar los \glspl{plugin} Liferay IDE y m2e-liferay disponibles en \url{http://releases.liferay.com/tools/ide/latest/milestone/}.
+
+\subsection{\IfLanguageName{english}{Installation and Setup
+procedures}{Procedimientos de instalación}}
+%Procedimientos de instalación y configuración de cada componente hardware y software (base y desarrollado) para asegurar la correcta instalación y explotación del sistema, así como aquellos procedimientos necesarios de migración/carga de datos.
+
+\subsubsection{Obtención del \gls{software}}
+Realizamos un checkout del código del \gls{sw} desde \gls{svn}  \url{https://svn.sistec.dlr.de/svn/xps/xps-server/branches/visual/webservice/} si no se dispone de una copia de trabajo.
+
+\subsubsection{Construcción del \gls{software}}
+Situándonos en el directorio donde se ha realizado el checkout, ejecutamos las lineas expuestas en el código \ref{code:swbuild}.
+
+\begin{listing}[H]
+    \begin{minted}[linenos,
+               numbersep=5pt,
+               frame=single,
+               framesep=2mm]{bash}
+               
+cd ./webservice/
+mvn clean install
+    \end{minted}
+    \caption{Construcción con \gls{maven} del \gls{sw}}
+    \label{code:swbuild}
+\end{listing}
+
+A través de \gls{eclipse} se puede realizar también añadiendo un nuevo ``Maven Run Configuration'' usando como directorio base \\
+$\$\{workspace\_loc:\/webservice\}$\\
+y como ``goal'' clean install para construir el \gls{sw}.
+
+\subsubsection{\Gls{despliegue} en \gls{liferay}}
+Gracias al \gls{plugin} anteriormente indicado, en el archivo de configuración de \gls{maven} del \gls{sw} se puede configurar para que \gls{eclipse} realice los \glspl{despliegue} en el portal \gls{liferay} de forma automática. Para ello hay que editar el fichero $pom.xml$ como se indica en el código \ref{code:pomsw}.
+
+\begin{listing}[H]
+    \begin{minted}[linenos,
+               numbersep=5pt,
+               frame=single,
+               framesep=2mm]{xml}
+               
+<properties>
+...
+<liferay.version>6.2.1</liferay.version>
+<liferay.auto.deploy.dir>
+	[UnzipDirectory]/liferay-portal-6.2-ce-ga2/deploy/
+</liferay.auto.deploy.dir>
+<liferay.maven.plugin.version>
+	6.2.1
+</liferay.maven.plugin.version>
+...
+</properties>
+...
+    \end{minted}
+    \caption{Extacto del fichero de configuración de \gls{maven} para auto-\gls{despliegue} con \gls{liferay}}
+    \label{code:pomsw}
+\end{listing}
+
+
+y luego ejecutar el \gls{plugin} desde la consola (código \ref{code:liferayautocons}) o configurando \gls{eclipse} añadiendo un nuevo ``Maven Run Configuration'' usando como directorio base\\
+$\$\{workspace\_loc:\/webservice\}$\\
+y como ``goal'' liferay:deploy.
+
+\begin{listing}[H]
+    \begin{minted}[linenos,
+               numbersep=5pt,
+               frame=single,
+               framesep=2mm]{bash}
+               
+cd ./webservice/
+mvn liferay:deploy
+    \end{minted}
+    \caption{Auto-\gls{deploy} con \gls{maven} del \gls{sw}}
+    \label{code:liferayautocons}
+\end{listing}
+
+
+\subsubsection{Configuración del \gls{sw}}
+
+También se debe de configurar el \gls{sw} para que utilice el índice \gls{solr}. Para ello se debe adaptar el fichero $webservice.properties$ (código \ref{code:swpropert}).
+
+\begin{listing}[H]
+    \begin{minted}[linenos,
+               numbersep=5pt,
+               frame=single,
+               framesep=2mm]{bash}
+               
+##
+## Solr connection
+##
+solr.scheme=http
+solr.host=localhost
+solr.port=8983
+# solr.username=username
+# solr.password =password
+solr.core=solr/strada
+    \end{minted}
+    \caption{Ejemplo de configuración del \gls{sw} para usar el índice de \gls{solr}}
+    \label{code:swpropert}
+\end{listing}
+
+\subsubsection*{Configuración en servidor}
+En el código \ref{code:liferaydebian} se muestra un ejemplo de configuración para crear un servicio en una máquina de la familia Debian.
+
+\begin{listing}[H]
+    \begin{minted}[linenos,
+               numbersep=5pt,
+               frame=single,
+               framesep=2mm]{bash}
+
+#!/bin/bash
+#
+#
+#
+#
+#
+Startup script for the Tomcat server
+description: Starts and stops the Tomcat daemon.
+processname: liferay (java)
+pidfile: /var/run/liferay.pid
+# See how we were called.
+JAVA_7_HOME="/usr/lib/jvm/jdk1.7.0_60/"
+case $1
+in
+start)
+export JAVA_HOME=$JAVA_7_HOME
+su - liferay -c 'sh /opt/liferay-portal-6.2-ce-ga2/tomcat-7.0.42/bin/startup.sh'
+;;
+stop)
+export JAVA_HOME=$JAVA_7_HOME
+su - liferay -c 'sh /opt/liferay-portal-6.2-ce-ga2/tomcat-7.0.42/bin/shutdown.sh'
+;;
+restart)
+export JAVA_HOME=$JAVA_7_HOME
+su - liferay -c 'sh /opt/liferay-portal-6.2-ce-ga2/tomcat-7.0.42/bin/shutdown.sh'
+su - liferay -c 'sh /opt/liferay-portal-6.2-ce-ga2/tomcat-7.0.42/bin/startup.sh'
+;;
+*)
+echo "Usage: /etc/init.d/liferay start|stop|restart"
+;;
+esac
+exit 0
+    \end{minted}
+    \caption{Ejemplo de servicio para \gls{liferay} en una máquina de Debian}
+    \label{code:liferaydebian}
+\end{listing}
+
+
+\subsection{\IfLanguageName{english}{Setup Testing}{Pruebas de implantación}}
+% Descripción de las pruebas a realizar después de la instalación del sistema. 
+Para comprobar que todo el proceso se ha realizado correctamente, simplemente hay que ejecutar algunas de las funciones del servidor. Utilizando la interfaz para \glspl{sw} de \gls{liferay} se pueden usar los formularios que automáticamente éste genera y ver que las peticiones realizan su cometido:
+\begin{enumerate}
+	\item Abrir la dirección \url{http://localhost:8080/api/jsonws}.
+    \item Seleccionar la \gls{api} de \gls{kf2}.
+    \item Utilizar el formulario para ejecutar alguna funcion de la \gls{api}.
+    \item Comprobar el resultado abriendo la \gls{url} generada.
+\end{enumerate}
+
+\subsection{\IfLanguageName{english}{Operating and Service-level
+Procedures}{Procedimientos de operación y nivel de servicio}}
+% Procedimientos necesarios para asegurar el correcto funcionamiento, rendimiento, disponibilidad y seguridad del sistema: back-ups, chequeo de logs, etc. También, es preciso indicar claramente aquellas actuaciones precisas necesarias para el mantenimiento preventivo del sistema y así prevenir posibles fallos en el mismo.
+Cada petición de \gls{liferay} queda registrado en un sistema de \gls{logging} propio de \gls{tomcat}. Durante toda la ejecución del \gls{sw} se puede consultar a través de los ficheros de la carpeta [UnzipDirectory]/liferay-portal-6.2-ce-ga2/tomcat-7.0.42/logs/.
+
+\section{Visualización}
+En esta sección se describe el manual de desarrollo, instalación y explotación del \gls{portlet} alojado en \gls{liferay} encargado de la visualización.
+
+\subsection{\IfLanguageName{english}{Requirements}{Requisitos previos}}
+
+\subsubsection{\Gls{sw} accesible}
+La visualización requiere del \gls{sw} explicado en la sección anterior (\ref{section:manualsw}. Necesita una instancia del índice \gls{sw} para el proyecto \gls{strada} en funcionamiento. 
+
+\subsubsection{\Gls{liferay} v6.2 CE Server (\gls{tomcat} 7)}
+Ver apartado \ref{subsubsection:reqliferay}
+
+\subsection{\IfLanguageName{english}{Installation and Setup
+procedures}{Procedimientos de instalación}}
+%Procedimientos de instalación y configuración de cada componente hardware y software (base y desarrollado) para asegurar la correcta instalación y explotación del sistema, así como aquellos procedimientos necesarios de migración/carga de datos.
+
+\subsubsection{Obtención del \gls{software}}
+Obtener el código del componente de visualización desde \gls{svn} (\url{https://svn.sistec.dlr.de/svn/xps/xps-server/branches/visual/de.dlr.xps.server.knowledgefinder.frontend/}) si no se dispone de una copia de trabajo.
+
+\subsubsection{Construcción del \gls{software}}
+Situándonos en el directorio donde se ha realizado el checkout, ejecutamos las lineas expuestas en el código \ref{code:visbuild}.
+
+
+\begin{listing}[H]
+    \begin{minted}[linenos,
+               numbersep=5pt,
+               frame=single,
+               framesep=2mm]{bash}
+
+cd ./de.dlr.xps.server.knowledgefinder.frontend/
+mvn clean install
+    \end{minted}
+    \caption{Construcción con \gls{maven} de la visualización}
+    \label{code:visbuild}
+\end{listing}
+
+A través de \gls{eclipse} se puede realizar también añadiendo un nuevo ``Maven Run Configuration'' usando como directorio base\\ 
+$\$\{workspace\_loc:\/de.dlr.xps.server.knowledgefinder.frontend\}$\\
+y como ``goal'' clean install para construir el \gls{portlet} para la visualización.
+
+\subsubsection{\Gls{despliegue} en \gls{liferay}}
+Gracias al \gls{plugin} anteriormente indicado, en el archivo de configuración de \gls{maven} de la visualización se puede configurar para que \gls{eclipse} realice los \glspl{despliegue}
+ en el portal \gls{liferay} de forma automática. Para ello hay que editar el fichero $pom.xml$ como se indica en el código \ref{code:pomvisual}.
+
+\begin{listing}[H]
+    \begin{minted}[linenos,
+               numbersep=5pt,
+               frame=single,
+               framesep=2mm]{xml}
+<properties>
+...
+<liferay.version>6.2.1</liferay.version>
+<liferay.auto.deploy.dir>
+	[UnzipDirectory]/liferay-portal-6.2-ce-ga2/deploy/
+</liferay.auto.deploy.dir>
+<liferay.maven.plugin.version>6.2.1</liferay.maven.plugin.version>
+...
+</properties>
+...
+    \end{minted}
+    \caption{Extracto del fichero de configuración de \gls{maven} para auto-\gls{deploy} con \gls{liferay}}
+    \label{code:pomvisual}
+\end{listing}
+
+
+y luego ejecutar el \gls{plugin} desde la cosola (código \ref{code:liferayautoconsfront}) o configurando \gls{eclipse} añadiendo un nuevo ``Maven Run Configuration'' usando como directorio base\\ 
+$\$\{workspace\_loc:\/de.dlr.xps.server.knowledgefinder.frontend\}$\\
+y como ``goal'' liferay:deploy.\\
+
+\begin{listing}[H]
+    \begin{minted}[linenos,
+               numbersep=5pt,
+               frame=single,
+               framesep=2mm]{bash}
+               
+cd ./de.dlr.xps.server.knowledgefinder.frontend/
+mvn liferay:deploy
+    \end{minted}
+    \caption{Auto-\gls{deploy} con \gls{maven} del \gls{sw}}
+    \label{code:liferayautoconsfront}
+\end{listing}
+
+
+Una vez que el \gls{portlet} ha sido \glslink{despliegue}{desplegado}, hay que añadirlo a una página de \gls{liferay} siguiendo los estos pasos:
+\begin{enumerate}
+	\item Acceder a \gls{liferay}.
+	\item Registrarse en el sistema.
+	\item Seleccionar la página donde se quiere añadir.
+	\item Pulsar en el botón \textit{Add}. Este aparece en la esquina superior izquierda del portal.
+	\item Seleccionar \textit{Applications} y luego el portlet de \gls{kf2}.
+	\item Arrastrar el elemento de la lista sobre la posición de la página.
+\end{enumerate}
+
+
+\subsubsection{Configuración de la visualización}
+
+También se debe de configurar el \gls{portlet} encargado de la visualización  para que acceda a las funciones del \gls{sw}. Para ello se debe adaptar el fichero $service.properties$ (código \ref{code:visualpropert}).
+
+\begin{listing}[H]
+    \begin{minted}[linenos,
+               numbersep=5pt,
+               frame=single,
+               framesep=2mm]{bash}
+
+host=http://localhost:8080
+url=/api/jsonws/KnowledgeFinderWebservice.knowledgefinder/
+urlDocuments=get-documents/
+urlNodes=get-nodes/
+    \end{minted}
+    \caption{Configuración para la comunicación \gls{portlet} de visualización con el \gls{sw}}
+    \label{code:visualpropert}
+\end{listing}
+
+
+\subsubsection*{Configuración en servidor}
+En el código \ref{code:liferaydebian} se muestra un ejemplo de configuración para crear un servicio en una máquina de la familia Debian.
+%% no incluir listing, sólo referencia al punto anterior
+
+\subsection{\IfLanguageName{english}{Setup Testing}{Pruebas de implantación}}
+% Descripción de las pruebas a realizar después de la instalación del sistema. 
+Para comprobar que todo el proceso se ha realizado correctamente, simplemente hay que ejecutar algunas de las funciones de la visualización. Si no aparece ningún elemento gráfico en la \gls{ui} puede significar que ésta no se puede comunicar con el \gls{sw}.
+
+\subsection{\IfLanguageName{english}{Operating and Service-level
+Procedures}{Procedimientos de operación y nivel de servicio}}
+% Procedimientos necesarios para asegurar el correcto funcionamiento, rendimiento, disponibilidad y seguridad del sistema: back-ups, chequeo de logs, etc. También, es preciso indicar claramente aquellas actuaciones precisas necesarias para el mantenimiento preventivo del sistema y así prevenir posibles fallos en el mismo.
+Cada petición de \gls{liferay} queda registrado en un sistema de \gls{logging} propio de \gls{tomcat}. Durante toda la ejecución de la visualización se puede consultar a través de los ficheros de la carpeta [UnzipDirectory]\/liferay-portal-6.2-ce-ga2\/tomcat-7.0.42\/logs\/.\\ 
+
+A nivel de \gls{ui}, algunos navegadores como \gls{chrome} o \gls{chromium} incorporan una cosola donde se muestran los errores en tiempo de ejecución y el \gls{logging} de \gls{js}.
+
+

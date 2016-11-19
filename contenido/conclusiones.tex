@@ -1,0 +1,161 @@
+% ------------------------------------------------------------------------------
+% Este fichero es parte de la plantilla LaTeX para la realización de Proyectos
+% Final de Grado, protegido bajo los términos de la licencia GFDL.
+% Para más información, la licencia completa viene incluida en el
+% fichero fdl-1.3.tex
+
+% Copyright (C) 2012 SPI-FM. Universidad de Cádiz
+% ------------------------------------------------------------------------------
+
+En este último capítulo se detallan las lecciones aprendidas tras el desarrollo del presente proyecto y se identifican las posibles oportunidades de mejora sobre el software desarrollado.
+
+\section{\IfLanguageName{english}{Targets Achieved}{Objetivos alcanzados}}
+% Este apartado debe resumir los objetivos generales y específicos alcanzados, relacionándolos con todo lo descrito en el capítulo de introducción.\\
+Tras la finalización del desarrollo de \gls{kf2} puedo afirmar que se han cubierto todos los retos y objetivos planteados a la comienzo de este \pfc{}. A continuación se describen los objetivos generales y específicos más representativos alcanzados.
+
+\subsection{Visualización del Conocimiento}
+La primera versión de \gls{kf} proporciona un sistema de búsqueda insuficiente para la información y las necesidades de los portales al estar centrada únicamente en el texto. En esta nueva versión, la complejidad de las relaciones de los \glspl{metadato} y de la información mostrada a través de las herramientas de visualización proporcionan a los usuarios de los portales que utilicen \gls{kf2} como base de su desarrollo, una \gls{ui} intuitiva, dinámica e interactiva donde se representan las estructuras de datos complejas del conocimiento.\\
+
+Con un esquema organizativo para la \gls{ui} semejante a la antigua versión, la curva de aprendizaje y adaptación al nuevo sistema no es muy marcada. La visualización aparece como el elemento principal de la búsqueda pero sin menospreciar las posibilidades a través del menú y de la búsqueda \gls{fulltext}.\\
+
+La \gls{ux} se ha visto claramente beneficiada. Todos los componentes de la interfaz interactúan entre ellos y proporciona al usuario información instantánea de las relaciones y estructuras de los documentos y los \glspl{metadato}. El usuario ya no verá el portal como un simple buscador de documentos sino como un portal sobre el conocimiento.\\
+
+Por todo lo anterior, puedo afirmar que este nuevo sistema genera nuevos conocimientos y resultados que facilitan el proceso investigador del `` \transmov'' en el \gls{dlr}.
+
+\subsection{Adaptación a nuevas Fuentes de Datos}
+Gracias a la redifinición del proceso para la importación de los datos y a la elección de \gls{solr} como \gls{motorbusqueda}, se ha obtenido un producto que acepta la incorporación de nuevas fuentes de datos (locales y remotas) al índice de búsqueda simplemente adaptando la configuración. Siendo esta idea uno de sus puntos claves durante la implementación, el resto de la aplicación es igualmente configurable y flexible para la incorporación de nuevos orígenes de datos.\\
+
+Gracias a estas consideraciones durante el desarrollo, el trabajo conjunto de las diferentes fuentes de información pertenecientes al \gls{dlr} ha impulsado notablemente el programa para ``Integración e interoperabilidad de las bases de datos sobre el transporte en el \gls{dlr}''.
+
+
+\begin{comment}
+Sistema de visualización
+- representación visual muy clara y feliz para el usuario
+- no traumatico para los usuarios actuales, -> se añade la visualizacion
+- facilita el proces investigardor
+- Representación clara e intuitiva de las nuevas estructuras
+- Mejora experiencia usuario, previsualizar datos antes qeu pase
+
+
+Sistema de importacion
+- adaptable a varias fuentes de datos sin modificar codigo
+\end{comment}
+
+\section{Mejoras Transversales de \gls{kf2}}
+A parte de los objetivos alcanzados que se plantearon durante la concepción del trabajo presente, se han obtenido importantes mejoras respecto a la versión anterior del \gls{kf2}. A continuación se explican algunas de las más significativas.
+
+\subsection{Mejora del Código}
+A pesar de un proceso realizado sobre \gls{kf} de refactorización y mejora del código, la calidad del mismo seguía siendo bastante deficiente (duplicación de código, código no usado, \dots). Por otra parte, la configuración de cada instancia para los distintos portales se realizaba a nivel de código lo que empeoraba aun más la situación.\\
+
+Gracias al replanteamiento de todo el sistema para \gls{kf2} se ha conseguido que atajar todos estos problemas usando ficheros de configuración adaptables para cada portal. Por ejemplo, para la instancia del portal \gls{strada} de \gls{kf} se han contado 424 ficheros \gls{java} de implementación propia con un total de 67565 líneas de código. Para la mima instancia pero basado en \gls{kf2}, 89 ficheros de código \gls{java}, \gls{js} y \gls{sass} de implementación propia con un total de 11856 líneas de código.
+ 
+
+\subsection{Mejora del Rendimiento}
+Usando \gls{solr} y la lectura directa del repositorio \gls{svn}, el proceso de importación para los datos ha reducido su proceso de creación del índice de búsqueda de 25 minutos a 2 minutos aproximadamente usando \gls{kf2}.\\
+
+Otra gran mejora ha sido el rendimiento de la \gls{ui}. En los portales donde se usan actualmente la versión inicial la reacción de la interfaz es lenta y torpe, llegando a confundir al usuario. Con la versión, incluso proveyendo de la visualización, esta interfaz  reacciona diligentemente a las peticiones del usuario.\\
+
+\subsection{Desarrollo más flexible}
+Usando \gls{mvc} en la nueva versión, el sistema es más adaptable a posibles cambios estructurales de las necesidades de los portales. Por ejemplo, si se decidiera por cambiar el sistema donde se aloja los portales de búsqueda, actualmente \gls{liferay}, no implicaría una reimplementación de todo el sistema.
+
+\begin{comment}
+
+Simpleza de codigo kf vs kf2, en líneas y en ficheros
+configuración para las distintas instancias a través de ficheros externos
+
+sistema más adaptable a un posible cambio de tegnologias pe django como backenD?! easy! MVC
+mejora de la performance
+mejora performance en la importacion
+
+nuevas tenconologias hmtl5, ... el futuro!
+
+facil configuración para cambiar los datos
+\end{comment}
+
+\section{\IfLanguageName{english}{Lessons Learned}{Lecciones aprendidas}}
+% A continuación, se detallan las buenas prácticas adquiridas, tanto tecnológicas como procedimentales, así como cualquier otro aspecto de interés.\\
+% Resumir cuantitativamente el tiempo y esfuerzo dedicados al proyecto a lo largo de su desarrollo que escribir un sencillo 'he trabajado mucho en este proyecto'.
+
+En este apartado se detallan las buenas prácticas adquiridas, tanto tecnológicas con procedimentales, y el conocimiento conseguido durante la ejecución del presente \pfc{}.\\
+
+Mi experiencia trabajando en el \gls{dlr} para el \gls{scvss} y la realización de este proyecto conjuntamente los institutos \gls{vf} y \gls{fw} ha sido realmente gratificante y enriquecedora en el ámbito profesional y personal. Por la naturaleza de esta institución, la burocracia necesaria para cada requerimiento para el proyecto a resultado a veces frustrante, siendo un riesgo incluso para el cumplimiento de la planificación establecida. A pesar de ello, esta burocracia, una vez tenida en cuenta con sus plazos, ha facilitado la cooperación y comunicación con el resto de entidades del \gls{dlr} implicadas.\\
+
+El replanteamiento desde cero de la implementación de \gls{kf2} fue una experiencia profesional muy valiosa. Partiendo de la base que  la anterior versión fue trabajo de dos tesis doctorales y de bastante dedicación para su implementación en \gls{monitor}, \gls{strada} y \gls{elib}, fue comprensible el primer rechazo y la negativa por parte de \gls{scvss} de reimplementar los componentes de \gls{software} ya concluidos y que se alejaban de la finalidad inicial del proyecto. A pesar de ello, con una extensa justificación basada en la calidad del producto y su aplicación futura, fue posible la implementación del producto completamente y con la satisfacción y agrado final del \gls{scvss} por el producto obtenido.\\
+
+A nivel tecnológico, he adquirido una gran experiencia en el desarrollo de herramientas para \gls{solr} y la  utilización de éste. Gracias a él y al \gls{sw} implementado, he afianzado mis conocimientos en \gls{java} y en el desarrollo de pruebas para la fase de \gls{testing}. Por otra parte, durante el estudio y el desarrollo de la visualización, he sido fascinado por las nuevas posibilidades que ofrece \gls{html5} junto a herramientas gráficas de \gls{js} como la usada \gls{d3}. Partiendo de un desconocimiento casi total de \gls{js}, gracias al desarrollo de esta parte de la aplicación, he obtenido un dominio considerable en este lenguaje. Por último, también he conseguido una base estable de programación de estilos \gls{css} usando  \gls{sass} y ayudado por la herramienta \gls{compass}.\\
+
+Por otra parte, a nivel organizativo, la duración estimada inicial del proyecto (gráfica de \gls{gantt} \ref{image:ganttinicial}) era de seis meses. Hasta el momento del replanteamiento de la implementación se cumplieron aproximadamente todos los plazos planificados para cada fase de proyecto excepto la fase de análisis que se alargó dos semanas más de lo estipulado. Cuando se acepto la replanificación del proyecto (gráfica de \gls{gantt} \ref{image:ganttrepla}), se dispuso más tiempo para dedicarle, principalmente, a las fases de análisis e implementación. Aunque este primero se finalizó tres semanas antes, se tuvo que realizar otra fase de análisis del nuevo sistema. Con estas modificaciones he aprendido la importancia para la gestión de proyectos de la estimación temporal y que, a pesar de la necesidad de cumplir los plazos, la flexibilidad de proceso de desarrollo debe estar ligado al tipo de proyecto.
+
+
+\begin{comment}
+! replanificación, comprar con gannt
+- Estudio previo
+- Obencion de requisitos de visualizacion
+- analisis
+- diseño
+- implementacion visualizacion
+
+-> replanificaición
+- EStido de las posiblidades para adaptar visualizacon
+- analisis 
+- diseño
+- implementacion
+
+ç
+
+- la burocracia justificada no siempre es mala pero hay que tenerla en cuenta
+- mi experiencia en el DLR, guai!!
+- mi lucha con el dlr y el KF1
+
+
+% Tecnolígicoas
+- mejora conocimenito java
+. fascinación por javascript en html5
+- sass, los estilos css son faciles!
+- pattern lo hace mas facil
+- las buenas formas hacen todo muy facil
+
+\end{comment}
+
+
+
+
+\section{\IfLanguageName{english}{Future Work}{Trabajo futuro}}
+% En esta sección, se presentan las diversas áreas u oportunidades de mejora detectadas durante el desarrollo del proyecto y que podrán ser abarcadas en futuras versiones del software.\\
+
+% Los elementos aquí descritos deben estar en relación con lo relatado en el apartado de objetivos y alcance del proyecto descritos en la introducción.
+
+% En esta sección, se presentan las diversas áreas u oportunidades de mejora detectadas durante el desarrollo del proyecto y que podrán ser abarcadas en futuras versiones del software.\\
+
+Una vez concluida esta versión del producto, hay mejoras que podrían indicar del trabajo futuro en el que se encaminará la culminación de este proyecto piloto. A continuación se muestra una lista con las posibles mejoras que, por falta de recursos o porque se salen del marco del proyecto, no han sido implementadas:
+
+\begin{itemize}
+    \sitem{Importación de nuevas fuentes de datos}
+    Durante el desarrollo del proyecto sólo se ha tenido la posibilidad de trabajar con los datos de pruebas de \gls{monitor} y \gls{cs}. La incorporación de nuevas fuentes de datos de otros portales e institutos se plantea como trabajo futuro cercano.
+    \sitem{Importación de otros formatos}
+    Actualmente sólo se aceptan elementos en formato \gls{json} proveniente de las propiedades de \gls{svn}. Para otras fuentes de datos, sería interesante la importación a través de otros métodos, por ejemplo, ficheros \gls{xml}.
+    \sitem{Adaptación a nuevos formatos}
+El formato de los datos de los repositorios \gls{svn} se encuentra actualmente en revisión y redefinición. Por ello, como trabajo futuro necesario será la adaptación del proyecto a los mismos. 
+    \sitem{Temas para \gls{liferay}}
+Para la implantación en producción del mismo para el portal \gls{strada}, la creación de unos estilos  para \gls{liferay} y la adaptación del código \gls{html}.
+    \sitem{Nuevos componentes para la visualización}
+Para completar la \gls{ux} se pueden añadir nuevos componentes de visualización como, por ejemplo, \gls{crossfilter} para la selección de intervalos de tiempo o \gls{leaflet} para la visualización espacial de los documentos.
+    \sitem{Aplicación del \gls{sw}}
+    Añadiendo funcionalidad al \gls{sw} se puede obtener una \gls{api} más rica para el uso de los datos por otros sistemas externos.
+    \sitem{Búsqueda semántica}
+    Añadir algún modelado de datos, por ejemplo \gls{rdf}, para utilizar el potencial de la búsqueda y web semántica. 
+    \sitem{Linked Data}
+    Añadir el conocimiento a Linked Data (\url{http://linkeddata.org/}).
+\end{itemize}
+
+
+\begin{comment}
+
+-incorporación al portal real
+-- utilización de los nuevos datos
+-- adaptación del theme de liferay para los portales
+
+Nuevos componentes de visualizacion facil
+servicio web apliable para linkedata
+Faclidad de nuevos elementos pe XML como entrada en elib
+\end{comment}

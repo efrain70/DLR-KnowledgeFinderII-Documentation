@@ -1,0 +1,518 @@
+% ------------------------------------------------------------------------------
+% Este fichero es parte de la plantilla LaTeX para la realización de Proyectos
+% Final de Grado, protegido bajo los términos de la licencia GFDL.
+% Para más información, la licencia completa viene incluida en el
+% fichero fdl-1.3.tex
+
+% Copyright (C) 2012 SPI-FM. Universidad de Cádiz
+% ------------------------------------------------------------------------------
+
+
+\begin{comment}
+Este capítulo trata sobre todos los aspectos relacionados con la implementación del sistema en código, haciendo uso de un determinado entorno tecnológico. 
+\end{comment}
+
+En este capitulo se detallarán los elementos relacionados con la implementación del \gls{framework} \gls{kf2} y el entorno tecnológico donde se ha desarrollado.
+
+
+\section{\IfLanguageName{english}{Development environment}{Entorno de
+Construcción}}
+\begin{comment}
+En esta sección se debe indicar el marco tecnológico utilizado para la construcción del sistema: entorno de desarrollo (IDE), lenguaje de programación, herramientas de ayuda a la construcción y despliegue, control de versiones, repositorio de componentes, integración contínua, etc.
+\end{comment}
+A continuación vamos a describir las herramientas utilizadas  durante el desarrollo resumidas en la sección \ref{section:dlr}.\\
+
+En entorno de desarrollo empleado fue \gls{eclipse} Kepler SR2 utilizándose \gls{java} 1.7 con \gls{jsdk} y \gls{js} como lenguajes de programación principales para el desarrollo del producto.\\
+
+Para controlar las versiones del producto se utilizó un repositorio \gls{svn} instalado en el \gls{dlr} para los proyectos internos el \gls{scvss}. Este repositorio se utilizó conjuntamente con el gestor de proyectos \gls{mantis} y \gls{jenkins} para la integración continua. Ambas herramientas empleadas por el \gls{scvss} para todos sus proyectos.\\
+
+En el \gls{scvss} se dispone de un propio repositorio de \gls{maven} para la gestión y construcción de proyectos. Por ello, esta herramienta fue esencial para la construcción y distribución del proyecto desarrollado.\\
+
+Como se comentó anteriormente, \gls{kf2} utiliza \gls{liferay} como portal y \gls{solr} para el índice de búsqueda. Por este motivo se utilizó una instancia de este portal (versión 6.2.1 CE GA2) funcionando sobre un servidor \gls{tomcat} 7 y de \gls{solr} 4.8.1 sobre \gls{jetty} en su configuración de ejemplo.\\
+
+Para hacer más cómodo el desarrollo, se empleó el \gls{software} \gls{jrebel} 5.6.1 que ayuda a la aplicación automática de la aplicación de las modificaciones en el código \glslink{despliegue}{desplegado}. También se utilizó el \gls{framework} \gls{wiremock} 1.18 para simular los servicios durante la fase \textit{Extended Static Prototype}(ver apartado \ref{subsubsection:aplicandoextre}).\\
+
+En la tabla \ref{table:pluginseclipse} se listan los \glspl{plugin} usados conjuntamente con \gls{eclipse} para integrar las herramientas anteriormente descritas en el entorno de desarrollo y completar la funcionalidad de este \gls{ide}.
+
+\begin{center}
+\begin {table}[H]
+\centering
+    \begin{tabular}{ | l   c   p{7cm} |}
+    \hline
+    \textbf{\Gls{plugin}} &  \textbf{Versión} & \textbf{Comentario} \\ \hline
+    %%%%%%
+     Subclipse & 1.10.5 & \Gls{plugin} para \gls{svn} \\ \hline
+     Mylyn Mantis Connector & 3.11.0 & \Gls{plugin} para \gls{mantis} \\ \hline
+     Hudson/Jenkins Mylyn Builds Connector & 1.4.0 & \Gls{plugin} para \gls{jenkins} \\ \hline
+     \Gls{jrebel} for \gls{eclipse} & 5.6.2 & \Gls{plugin} para \gls{jrebel} \\ \hline 
+     \Gls{liferay} \gls{ide} & 2.1.1 GA2 & \Gls{plugin} para \gls{liferay} \\ \hline 
+     m2e-liferay & 2.1.1 GA2 & \Gls{plugin} para uso conjunto de \gls{maven} y \gls{liferay} \\ \hline
+     
+    \end{tabular}
+    \caption{\Glspl{plugin} usados en \gls{eclipse} durante el desarrollo.}
+    \label{table:pluginseclipse}
+    \end{table}
+\end{center}
+
+\section{\IfLanguageName{english}{Source Code}{Código Fuente}}
+\begin{comment}
+Organización del código fuente, describiendo la utilidad de los diferentes ficheros y su distribución en paquetes o directorios. Asimismo, se incluirá algún extracto significativo de código fuente que sea de interés para ilustrar algún algoritmo o funcionalidad específica del sistema.
+\end{comment}
+
+Como se ha descrito en apartados anteriores, la aplicación está descompuesta en tres subsistemas. A continuación se va a describir el código de cada uno de ellos y los ficheros  claves para la configuración para el proyecto usado como ejemplo \gls{strada}.
+
+\subsection{Índice Solr}
+La importación de la información contenida en los repositorios \gls{svn} esta implementada principalmente en los siguientes paquetes de \gls{java}:
+\begin{itemize}
+	\item \textbf{de.dlr.xps.server.handler.dataimport.crawler}
+    En este paquete se implementa la funcionalidad del subsistema \gls{svn} Crawler
+    (ver \ref{subsubsection:n2building})
+    \item \textbf{de.dlr.xps.server.handler.dataimport.datapicker}
+    En este paquete se implementa la funcionalidad del subsistema \gls{svn} DataPicker
+    (ver \ref{subsubsection:n2building})
+    \item \textbf{de.dlr.xps.server.handler.dataimport.parser}
+    En este paquete se implementa la funcionalidad del subsistema \gls{svn} Parser
+    (ver \ref{subsubsection:n2building})
+    \item \textbf{de.dlr.xps.server.handler.dataimport.transformer}
+    En este paquete se implementa la funcionalidad del subsistema \gls{solr} Transformers
+    (ver \ref{subsubsection:n2building})
+    \item \textbf{de.dlr.xps.server.handler.dataimport}
+    En este paquete se implementa la funcionalidad del subsistema \gls{svn} DataImport
+    (ver \ref{subsubsection:n2building})
+\end{itemize}
+
+Los archivos de configuración para el proyecto \gls{strada} indican cómo debe de realizarse la importación y el esquema del índice de búsqueda. En el fragmento de código \ref{code:import} es observa el fichero \textit{data-conf.xml} resumido para un origen de datos.
+
+\begin{listing}[H]
+\begin{minted}[linenos,
+               numbersep=5pt,
+               frame=single,
+               fontsize=\scriptsize,
+               framesep=2mm]{xml}
+                
+<dataConfig>
+ <dataSource name="StradaSVN" type="SVNDataSource" />
+ <document>
+  <entity name="strada" 
+   processor="SVNEntityProcessor"
+   transformer="
+      RegexTransformer,
+      TemplateTransformer,
+      de.dlr.xps.server.handler.dataimport.transformer.GenerateIdTransformer,
+      de.dlr.xps.server.handler.dataimport.transformer.LStripTransformer,
+      de.dlr.xps.server.handler.dataimport.transformer.ExcludeValuesTransformer,
+      de.dlr.xps.server.handler.dataimport.transformer.CategoriesIdTransformer,
+      de.dlr.xps.server.handler.dataimport.transformer.CategoriesSeparatedTransformer,
+      de.dlr.xps.server.handler.dataimport.transformer.DateIncompleteFormatTransformer,
+      de.dlr.xps.server.handler.dataimport.transformer.SpatialCoverageTransformer,
+      de.dlr.xps.server.handler.dataimport.transformer.DictionaryListTransformer"
+   
+   query="/home/efrain/Escritorio/dlr_software/svn/local/CS">
+   <!-- RegexTransformer -->
+   <field column="timePeriodOfDataCollection"
+          regex="(.*)\s-\s(.*)" 
+          groupNames="startCollection,endCollection"/>
+   <!-- RegexTransformer -->
+   <field column="temporalCoverage" 
+   		  regex="(.*)\s-\s(.*)" 
+          groupNames="startCoverage,endCoverage"/>
+   <!-- DateIncompleteFormatTransformer -->
+   <field column="startTemporalCoverage" 
+          sourceColName="startCoverage" 
+          parseToDate="start" 
+          regex="^(?&lt;year&gt;\d{4})(\D)?(?&lt;month&gt;\d{2})?(\D)?(?&lt;day&gt;\d{2})$"/>
+   <field column="endTemporalCoverage" 
+          sourceColName="endCoverage" 
+          parseToDate="end" 
+          regex="^(?&lt;year&gt;\d{4})(\D)?(?&lt;month&gt;\d{2})?(\D)?(?&lt;day&gt;\d{2})?$"/>
+   <!-- ExcludeValuesTransformer, CategoriesIdTransformer, CategoriesSeparatedTransformer -->
+   <field column="contentCategories" 
+         name="categories" 
+         exclude="import/cs-exclude-categories.txt" 
+         categories="import/cs-categories.json" 
+         categories_id_name="categories_id" 
+         categories_split_prefix="category_"/>
+   
+   <!-- LStripTransformer, ExcludeValuesTransformer, SpatialCoverageTransformer -->
+   <field column="spatialCoverage" 
+          lstrip="import/strip-spatial.txt" 
+          exclude="import/exclude-spatial.txt"
+          spatialColumns="world,regionsWorld,countries,regions"
+          worldFile="import/world.txt" 
+          worldRegionsFile="import/worldRegions.txt"/>
+   <!-- DictionaryListTransformer -->
+   <field column="authors" 
+          dictionaryId="author" />
+  </entity>
+  ...
+ </document>
+</dataConfig>
+	\end{minted}
+	\caption{Ejemplo de importación de datos en \gls{kf2} para \gls{strada}}
+	\label{code:import}
+\end{listing}
+
+Para definir el esquema del índice \gls{solr} se utiliza el fichero \textit{schema.xml}. En el código \ref{code:schema} se oberva como se ha definido éste para \gls{strada}.
+
+\begin{listing}[H]
+\begin{minted}[linenos,
+               numbersep=5pt,
+               frame=single,
+               fontsize=\scriptsize,
+               framesep=2mm]{xml}
+                
+<?xml version="1.0" encoding="UTF-8" ?>
+<schema name="knowledgefinder" version="1.5">
+ <fields>
+  <field name="_version_" type="long" indexed="true" stored="true" />
+  <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+  <field name="title" type="text_general" indexed="true" stored="true" multiValued="false" required="true" />
+  <field name="description" type="text_general" indexed="false" stored="true" multiValued="false"/>
+  <field name="keywords" type="string" indexed="true" stored="true" multiValued="true" />
+  <field name="categories" type="string" indexed="false" stored="true" multiValued="true" />
+  <field name="filePath" type="string" indexed="false" stored="true" multiValued="false" />
+  <field name="institute" type="string" indexed="true" stored="true" multiValued="false" />
+  <field name="timePeriodOfDataCollection" type="string" indexed="false" stored="true" multiValued="false" />
+  <field name="startTimePeriodOfDataCollection" type="tdate" indexed="true" stored="true" multiValued="false" />
+  <field name="endTimePeriodOfDataCollection" type="tdate" indexed="true" stored="true" multiValued="false" />
+  <field name="startDateDate" type="tdate" indexed="true" stored="true" multiValued="false" />
+  <field name="temporalCoverage" type="string" indexed="false" stored="true" multiValued="false" />
+  <field name="startTemporalCoverage" type="tdate" indexed="true" stored="true" multiValued="false" />
+  <field name="endTemporalCoverage" type="tdate" indexed="true" stored="true" multiValued="false" />
+  <field name="spatialCoverage" type="string" indexed="false" stored="true" multiValued="true" />
+  <field name="world" type="string" indexed="true" stored="false" multiValued="true" />
+  <field name="regionsWorld" type="string" indexed="true" stored="false" multiValued="true" /> 
+  <field name="countries" type="string" indexed="true" stored="false" multiValued="true" />
+  <field name="regions" type="string" indexed="true" stored="false" multiValued="true" />
+  <field name="size_author" type="int" indexed="false" stored="true" multiValued="false" />
+  <field name="____contentcreationdatetime____" type="int" indexed="true" stored="false" multiValued="false" />
+  <field name="____contentmodificationdatetime____" type="int" indexed="true" stored="false" multiValued="false" />
+  <dynamicField name="author_uid_*" type="string" indexed="false" stored="true" multiValued="false" />
+  <dynamicField name="author_firstName_*" type="string" indexed="false" stored="true" multiValued="false" />
+  <dynamicField name="author_lastName_*" type="string" indexed="false" stored="true" multiValued="false" />
+  <dynamicField name="author_mail_*" type="string" indexed="false" stored="true" multiValued="false" />
+  <dynamicField name="author_organization_*" type="string" indexed="false" stored="true" multiValued="false" />
+  <field name="full_text_search" type="text_general" indexed="true" stored="false" multiValued="true" />
+  <field name="title_sort" type="alphaOnlySort" indexed="true" stored="true" multiValued="false" />
+
+  <copyField source="title" dest="full_text_search" />  
+  <copyField source="title" dest="title_sort" />
+  <copyField source="description" dest="full_text_search" />
+  <copyField source="keywords" dest="full_text_search" />
+  <copyField source="categories" dest="full_text_search" />
+  <copyField source="world" dest="full_text_search" />
+  <copyField source="regionsWorld" dest="full_text_search" />
+  <copyField source="countries" dest="full_text_search" />
+  <copyField source="regions" dest="full_text_search" />
+  <copyField source="author_uid_*" dest="full_text_search" />
+  <copyField source="author_firstName_*" dest="full_text_search" />
+  <copyField source="author_lastName_*" dest="full_text_search" />
+  <copyField source="author_mail_*" dest="full_text_search" />
+  <copyField source="author_organization_*" dest="full_text_search" />
+  <!-- From Transformer Categories -->
+  <dynamicField name="category_*" type="string" indexed="true" stored="true" multiValued="true" />
+  <copyField source="category_*" dest="full_text_search" />
+  <!-- Not logger required -->
+  <field name="categories_id" type="ignored" indexed="false" stored="false" multiValued="true" />
+  <dynamicField name="*" type="ignored" indexed="true" stored="true" multiValued="true" />
+ </fields>
+ <uniqueKey>id</uniqueKey>
+ ...
+	\end{minted}
+	\caption{Ejemplo de esquema del índice \gls{solr} en \gls{kf2} para \gls{strada}}
+	\label{code:schema}
+\end{listing}
+
+\subsection{Servicio Web}
+El \gls{sw} que corre sobre \gls{liferay} está organizado en tres paquetes de \gls{java}:
+\begin{itemize}
+	\sitem{de.dlr.xps.server.knowledgefinder.webservice.solr}
+    En este paquete se encuentra el código para obtener la configuración del \gls{sw}.
+    \sitem{de.dlr.xps.server.knowledgefinder.webservice.solr.query}
+    Para personalizar y configurar las consultas para cada tipo de rol se han definido en este paquete unas clases en modo de ejemplo para los supuestos roles de usuario.
+    \sitem{de.dlr.xps.server.knowledgefinder.webservice.service}
+    En este paquete se encuentran las clases que definen la \gls{api} del \gls{sw} y su implementación.
+\end{itemize}
+
+Para configurar el \gls{sw} y definir el punto de conexión con el servidor \gls{solr} se tiene el fichero \textit{webservice.properties}. En el código \ref{code:service} se puede observar un ejemplo de configuración para el proyecto \gls{strada}.
+
+\begin{listing}[H]
+\begin{minted}[linenos,
+               numbersep=5pt,
+               frame=single,
+               framesep=2mm]{bash}
+##
+## Solr connection
+##
+	solr.scheme=http
+	solr.host=localhost
+	solr.port=8983
+	solr.username=username
+	solr.password =password
+	solr.core=solr/strada
+
+    \end{minted}
+	\caption{Ejemplo de configuración del \gls{sw} en \gls{kf2} para \gls{strada}}
+	\label{code:service}
+\end{listing}
+
+\subsection{Visualización}
+El subsistema de visualización se puede dividir en grupos de código con propositos claramente diferenciados:
+
+\begin{itemize}
+	\sitem{de.dlr.xps.server.knowledgefinder.frontend.controller}
+    En este paquete se encuentra el código encargado de inicializar el \gls{portlet} con la para la página web.
+    \sitem{de.dlr.xps.server.knowledgefinder.frontend.menu}
+    A través de un fichero de configuración, genera el el menú para incorporarlo a la visualización.
+    \sitem{Directorio styles-sass}
+    En este directorio se encuentra el código en \gls{sass} para definir los estilos de la aplicación.
+    \sitem{Directorio js}
+    Todo el código \gls{js} creado para la visualización se encuentra alojado en este directorio junto con las librerías empleadas.
+\end{itemize}
+
+\subsubsection{Menú}
+
+Para configurar el menú se utiliza el fichero en formato \gls{json} \textit{menuConfiguration.json}. La tabla \ref{table:formatomenu} muestra el formato de los elementos de configuración que lo componen. En el código \ref{code:categorias} se muestra la configuración para \gls{strada}.
+
+\begin{center}
+\begin {table}[H]
+	\centering
+    \begin{tabular}{ | l l |}
+    \hline
+    \textbf{Propiedad} & \textbf{Comentario} \\ \hline
+    %%%%%%
+    id & Valor identificativo del elemento  \\ \hline
+    name & Nombre mostrado en el menú  \\ \hline
+    query & Búsqueda aplicada para el elemento principal \\ \hline
+    cssClass & Clase de CSS para el grupo \\ \hline
+    subItemsFacet & Consulta facet para obtener los subelementos \\ \hline
+    collapsed & Indica si se debe mostrar el grupo plegado \\ \hline
+    scrollable & Indica se utiliza un \gls{scroll} para el grupo \\ \hline
+    subItems & Lista de subelementos de configuración \\ \hline
+    children\_filter & Indica si los subelementos deben ignorarse \\ \hline
+    \end{tabular}
+    \caption{Formato de los elementos de configuración para el menú}
+    \label{table:formatomenu}
+  \end{table}
+\end{center}
+
+
+\begin{listing}[H]
+\begin{minted}[linenos,
+               numbersep=5pt,
+               frame=single,
+               fontsize=\scriptsize,
+               framesep=2mm]{json}
+{
+  "menuItems": [
+    {
+      "id": "CAT",
+      "name": "Categories",
+      "cssClass": "CAT-filter",
+      "collapsed": false,
+      "scrollable": false,
+      "subItems": [
+        {
+          "id": "PT",
+          "name": "Passenger Transport",
+          "subItemsFacet": "category_Passenger Transport",
+          "cssClass": "CAT-PT-filter",
+          "collapsed": true,
+          "scrollable": true,
+          "children_filter": true
+        },
+...
+      ]
+    },
+    {
+      "id": "SC",
+      "name": "Spatial Coverage",
+      "cssClass": "SC-filter",
+      "collapsed": false,
+      "scrollable": false,
+      "subItems": [
+        {
+          "id": "SCW",
+          "name": "World",
+          "subItemsFacet": "world",
+          "cssClass": "SC-SCW-filter",
+          "collapsed": true,
+          "scrollable": true,
+          "children_filter": false
+        },
+        {
+          "id": "SCWR",
+          "name": "Word regional level",
+          "subItemsFacet": "regionsWorld",
+          "cssClass": "SC-SCWR-filter",
+          "collapsed": true,
+          "scrollable": true,
+          "children_filter": true
+        },
+...
+      ]
+    },
+    {
+      "id": "KW",
+      "name": "Keywords",
+      "cssClass": "red",
+      "query": "keywords:[\"\" TO *]",
+      "cssClass": "KW-filter",
+      "subItemsFacet": "keywords",
+      "collapsed": true,
+      "scrollable": true,
+      "subItems": []
+    }
+  ]
+}
+    \end{minted}
+	\caption{Ejemplo de configuración del menú en \gls{kf2} para \gls{strada}}
+	\label{code:categorias}
+\end{listing}
+
+\subsubsection{\gls{js}} 
+En la tabla \ref{table:javascriptplug} se muestra las herramientas externas usadas para este proyecto de \gls{js}.
+
+\begin{center}
+\begin {table}[H]
+	\centering
+    \begin{tabular}{ | l l |}
+    \hline
+    \textbf{Herramienta} & \textbf{Comentario} \\ \hline
+    %%%%%%
+    \gls{d3} & Herramienta principal de la visualización  \\ \hline
+    \gls{bootstrap} & Código para componentes visuales \\ \hline
+    jQuery & Herramienta requerida por otras \\ \hline
+    Queue.js & Ejecución en paralelo de código \gls{js} \\ \hline
+    URI.js & Herramienta para el manejo de \glspl{url} \\ \hline
+    History.js & Manipulación del historial para \gls{html5} \\ \hline
+    mCustomScrollbar.js & \Gls{scroll} en menú \\ \hline
+    \end{tabular}
+    \caption{Herramientas de \gls{js} usadas}
+    \label{table:javascriptplug}
+  \end{table}
+\end{center}
+
+
+\subsubsection{Estilos \gls{css}}
+
+Todos los estilos de la aplicación se han personalizado basándose en la librería \gls{bootstrap} y se han escrito usando \gls{sass}. Para la compilación y aplicación de todos los ficheros fuentes de \gls{sass} se ha usado el \gls{software} \gls{compass}.\\
+
+Para configurar los colores de los elementos gráficos de visualización de la \gls{ui} se ha definido en un único fichero de  \gls{sass}, \textit{\_filter\_colors.scss}, la paleta de colores a usar. En los códigos \ref{code:colorssass} y \ref{code:colorssass2} se muestran cómo es para \gls{strada}.
+
+\begin{listing}[H]
+\begin{minted}[linenos,
+               numbersep=5pt,
+               frame=single,
+               fontsize=\scriptsize,
+               framesep=2mm]{sass}
+               
+/* Germany colors
+$CAT-color: lighten(#000000, 50%);
+$SC-color: #CD0000;
+$KW-color: #FFCC00
+*/
+
+/* DLR colors */
+$CAT-color: rgb(75, 128, 136);
+$SC-color: rgb(73, 107, 169);
+$KW-color: rgb(126, 75, 86);
+
+$filterColors: (
+   CAT-filter: $CAT-color,
+   CAT-PT-filter: $CAT-color,
+   CAT-T-filter: $CAT-color, 
+   CAT-CT-filter: $CAT-color,
+   CAT-EI-filter: $CAT-color,
+   CAT-VT-filter: $CAT-color,
+   CAT-IN-filter: $CAT-color,
+   CAT-FDG-filter: $CAT-color,
+   CAT-TMP-filter: $CAT-color, 
+   
+   SC-filter: $SC-color,
+   SC-SCW-filter: $SC-color,
+   SC-SCWR-filter: $SC-color, 
+   SC-SCC-filter: $SC-color,
+   SC-SCR-filter: $SC-color,
+   
+   KW-filter: $KW-color,
+);
+
+    \end{minted}
+	\caption{Ejemplo de paleta de colores en \gls{kf2} para \gls{strada}}
+	\label{code:colorssass}
+\end{listing}
+
+\begin{listing}[H]
+\begin{minted}[linenos,
+               numbersep=5pt,
+               frame=single,
+               fontsize=\scriptsize,
+               framesep=2mm]{sass}
+               
+@each $filter, $color in $filterColors {
+ .#{$filter} {
+  /* Graph circles */
+  &.gnode {
+   > circle {
+    fill: $color;
+   }
+  }
+  /* Current selection */
+  &.sel-filter {
+   color: $color;
+   border-color: $color;
+  }
+  /* Navigation table, selected */
+  &.selected{
+   .header-filter {
+    background-color: rgba($color, 0.25);
+   }
+  }
+ }
+}
+.CAT-filter {
+ .header-group {
+  color: white;
+  background-color: map-get($filterColors, CAT-filter);
+ }
+ .header-filter {
+  background-color: rgba(map-get($filterColors, CAT-filter), .1);
+  
+  > a {
+   color: map-get($filterColors, CAT-filter);
+  }
+ }
+ .header-subfilter { 
+  .name {
+   color: map-get($filterColors, CAT-filter);
+  }
+ }
+}
+/* Example, how to change color of a subfilter */
+/*
+.CAT-CT-filter {
+ .header-filter {
+  background-color: rgba(map-get($filterColors, CAT-CT-filter), .1);
+  > a {
+   color: map-get($filterColors, CAT-CT-filter);
+  }
+ }
+ .header-subfilter { 
+  .name {
+   color: map-get($filterColors, CAT-CT-filter);
+  }
+ }
+}
+*/
+...
+    \end{minted}
+	\caption{Ejemplo de aplicación de la paleta de colores en \gls{kf2} para \gls{strada}}
+	\label{code:colorssass2}
+\end{listing}
+
+
+% \section{\IfLanguageName{english}{}{Scripts de Base de datos}}
+% Organización del código fuente, describiendo la utilidad de los diferentes
+% ficheros y su distribución en paquetes o directorios. Asimismo, se incluirá el
+% script de algún disparador o un procedimiento almacenado, que sea de interés para ilustrar algún aspecto concreto de la gestión de la base de datos.
