@@ -1,0 +1,135 @@
+\documentclass[11pt,spanish,a4paper, oneside, openany]{book}
+
+% @ as letter in com
+\newcommand{\at}{\makeatletter @\makeatother}
+
+% PAQUETES
+\usepackage{./estilo/paquetes}
+\usepackage{./estilo/colores}
+\usepackage{./estilo/comandos}
+\input{./estilo/constantes}
+
+
+\makeglossaries
+
+% glossary
+\input{./glossary}
+\input{./acronyms}
+
+% Seleccionando el idioma [english, spanish o german]
+\selectlanguage{spanish}
+% Ruta al directorio de imágenes
+\graphicspath{{./img/}} 
+
+% METADATOS
+\title{\pfctitle}
+\author{\authorname}
+\date{\getdatemonth{theday} \getdateyear{theday}} 
+
+\begin{document}
+\pagestyle{empty}
+
+% PORTADAS
+\input{./portadas/portada-inicial}
+\cleardoublepage
+
+\input{./portadas/portada-secundaria}
+\cleardoublepage
+
+\automark[chapter]{chapter}
+
+\pagestyle{scrheadings}
+
+
+% PRELIMINARES
+\input{contenido/agradecimientos}
+\newpage
+
+% \input{contenido/resumen}
+\newpage
+
+
+\frontmatter
+
+% INDICES
+\tableofcontents
+\listoffigures
+\listoftables
+\listoflistings
+
+% GLOSARIO DE TERMINOS
+%\printglossary[title=Lista de Términos,toctitle=Términos y abreviaturas]
+
+
+% \addcontentsline{toc}{chapter}{Términos y abreviaturas}
+
+\glsaddallunused
+% Acronyms
+\printglossary[type=\acronymtype, style=url, title=Acrónimos]
+
+% Glossary
+\printglossary[type=main, style=url, title=Glosario]
+
+\mainmatter
+% \makegloss
+
+
+% PROLEGÓMENO
+\part{\IfLanguageName{english}{Prologue}{Prolegómeno}}
+\null\vfill
+
+\chapter{\IfLanguageName{english}{Introduction}{Introducción}}
+\input{./contenido/introduccion}
+ 
+\chapter{\IfLanguageName{english}{Schedule}{Planificación}}
+\input{./contenido/planificacion}\textbf{}
+
+% DESARROLLO
+\part{\IfLanguageName{english}{Development}{Desarrollo}}
+\null\vfill
+
+\chapter{\IfLanguageName{english}{System Requirements}{Requisitos del Sistema}}
+\input{./contenido/requisitos}
+
+\chapter{\IfLanguageName{english}{Systems analysis}{Análisis del Sistema}}
+\input{./contenido/analisis}
+
+\chapter{\IfLanguageName{english}{System Design}{Diseño del Sistema}}
+\input{./contenido/diseno}
+
+\chapter{\IfLanguageName{english}{Implementation}{Construcción del Sistema}}
+\input{./contenido/implementacion}
+
+\chapter{\IfLanguageName{english}{Testing}{Pruebas del Sistema}}
+\input{./contenido/pruebas}
+
+% EPILOGO
+\part{\IfLanguageName{english}{Epilogue}{Epílogo}}
+\null\vfill
+
+ 
+\vfill
+
+\chapter{\IfLanguageName{english}{Reference Guide}{Manual de implantación y
+explotación}}
+\input{./contenido/manual_instexp}
+
+\chapter{\IfLanguageName{english}{User Guide}{Manual de usuario}}
+\input{./contenido/manual_usuario}
+
+\chapter{\IfLanguageName{english}{Conclusions}{Conclusiones}}
+\input{./contenido/conclusiones}
+
+\bibliographystyle{alpha}
+\nocite{*}
+\bibliography{bibliografia}
+\addcontentsline{toc}{chapter}{\bibname}
+
+
+\backmatter
+\pagestyle{empty}
+% \input{./anexos/general}
+\input{./anexos/fdl-1.3} %GNU
+
+
+\end{document}
