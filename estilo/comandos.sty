@@ -1,0 +1,73 @@
+% ------------------------------------------------------------------------------
+% Este fichero es parte de la plantilla LaTeX para la realización de Proyectos
+% Final de Grado, protegido bajo los términos de la licencia GFDL.
+% Para más información, la licencia completa viene incluida en el
+% fichero fdl-1.3.tex
+
+% Copyright (C) 2012 SPI-FM. Universidad de Cádiz
+% ------------------------------------------------------------------------------
+
+%---------COMANDOS------------------------------
+\parindent = 0mm % margin from Title Tab at start?
+\topmargin = -0.5cm
+\setheadsepline{.4pt}
+\headsep = 1cm
+\setcounter{secnumdepth}{3}
+\renewcommand{\spanishlisttablename}{Índice de tablas}
+\renewcommand{\spanishtablename}{Tabla}
+
+\lefoot{}                      %% Bottom left on even pages
+\lofoot{}                      %% Bottom left on odd pages
+\refoot{}                      %% Bottom right on even pages
+\rofoot{}                      %% Bottom right on odd pages
+\cfoot{}                           %% Bottom center
+
+\lehead{\bfseries\pagemark}    %% Top left on even pages
+\lohead{\bfseries\headmark}    %% Top left on odd pages
+\rehead{\bfseries\headmark}    %% Top right on even pages
+\rohead{\bfseries\pagemark}    %% Top right on odd pages
+\chead{}                       %% Top center
+
+\automark[subsection]{section}
+
+% new commands for todonotes
+\newcommand{\addref}{\todo[color=red!40]{Add reference.}}
+\newcommand{\question}[1]{\todo[color=green!40]{#1}}
+\newcommand{\review}[1]{\todo[color=magenta!40]{#1}}
+
+% paragraph with new line
+\newcommand{\sparagraph}[1]{\paragraph{#1}\mbox{}\\}
+
+\newcommand{\sitem}[1]{\item{\textbf{#1}}\mbox{}\\}
+
+% lising with caption code
+\renewcommand\listingscaption{Código}
+\renewcommand\listoflistingscaption{Lista de códigos}
+
+
+% Styles with url in glossaries
+\newglossarystyle{url}
+{% based on list style (adapt as required)
+  \setglossarystyle{list}%
+    \renewcommand{\glossentry}[2]{%
+    \item[\glsentryitem{##1}%
+          \glstarget{##1}{\glossentryname{##1}}]
+       \glossentrydesc{##1}\glspostdescription\space##2%
+    \ifglshasfield{useri}{##1}{\glspar
+     \glsletentryfield{\thisurl}{##1}{useri}%
+     \expandafter\url\expandafter{\thisurl}}{}}%
+}
+
+% para rotar títulos en tablas
+\usepackage{adjustbox}
+\usepackage{array}
+\newcolumntype{R}[2]{%
+    >{\adjustbox{angle=#1,lap=\width-(#2)}\bgroup}%
+    l%
+    <{\egroup}%
+}
+\newcommand*\rot{\multicolumn{1}{R{45}{1em}}}
+
+%tilde low
+% \usepackage{textcomp}
+% \newcommand{\textapprox}{\raisebox{0.5ex}{\texttildelow}}
